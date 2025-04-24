@@ -104,40 +104,57 @@ with st.form("form_prestamo"):
     submitted = st.form_submit_button("Evaluar Solicitud")
 
     if submitted:
-        # Llamada a la función de evaluación
-        puntaje = evaluar_prestamo(puntaje_credito, ingresos_mensuales, deudas, garantia, tiempo_empleo)
+        errores = []
+        if ingresos_mensuales <= 0:
+            errores.append("Los ingresos mensuales deben ser mayores que cero.")
+        if deudas < 0:
+            errores.append("Las deudas mensuales no pueden ser negativas.")
+        if deudas > ingresos_mensuales:
+            errores.append("Las deudas mensuales no pueden superar los ingresos mensuales.")
+        if puntaje_credito < 300 or puntaje_credito > 850:
+            errores.append("El puntaje crediticio debe estar entre 300 y 850.")
+        if tiempo_empleo < 0 or tiempo_empleo > 50:
+            errores.append("El tiempo en empleo debe estar entre 0 y 50 años.")
+        if monto_prestamo < 100:
+            errores.append("El monto solicitado debe ser al menos $100.")
 
-        st.subheader("Resultado de la Evaluación")
-
-        # Determinación del resultado según el puntaje obtenido
-        if puntaje >= 80:
-            st.success("✅ Préstamo APROBADO")
-            # Cálculo de tasa de interés aleatoria dentro de un rango
-            tasa_interes = 8.5 + np.random.uniform(0, 3)
-            # Cálculo del plazo máximo aprobado
-            plazo_max = min(60, int(monto_prestamo / (ingresos_mensuales * 0.4)))
-            st.write(f"Tasa de interés ofrecida: {tasa_interes:.2f}%")
-            st.write(f"Plazo máximo aprobado: {plazo_max} meses")
-        elif puntaje >= 60:
-            st.warning("⚠️ Préstamo CONDICIONAL")
-            st.write("Se requiere revisión adicional o garantía adicional")
-            st.write("Un asesor se comunicará contigo")
+        if errores:
+            st.error("\n".join(errores))
         else:
-            st.error("❌ Préstamo RECHAZADO")
-            st.write("No cumples con los requisitos mínimos")
+            # Llamada a la función de evaluación
+            puntaje = evaluar_prestamo(puntaje_credito, ingresos_mensuales, deudas, garantia, tiempo_empleo)
 
-        # Mostrar el puntaje obtenido
-        st.write(f"Puntaje de evaluación: {puntaje}/100")
+            st.subheader("Resultado de la Evaluación")
 
-        # Recomendaciones para mejorar la elegibilidad si el puntaje es bajo
-        if puntaje < 60:
-            st.info("""
-            **Recomendaciones para mejorar tu elegibilidad:**
-            - Mejora tu puntaje crediticio pagando deudas a tiempo
-            - Reduce tu ratio de deuda/ingresos
-            - Considera ofrecer una garantía
-            - Mantén tu empleo actual por más tiempo
-            """)
+            # Determinación del resultado según el puntaje obtenido
+            if puntaje >= 80:
+                st.success("✅ Préstamo APROBADO")
+                # Cálculo de tasa de interés aleatoria dentro de un rango
+                tasa_interes = 8.5 + np.random.uniform(0, 3)
+                # Cálculo del plazo máximo aprobado
+                plazo_max = min(60, int(monto_prestamo / (ingresos_mensuales * 0.4)))
+                st.write(f"Tasa de interés ofrecida: {tasa_interes:.2f}%")
+                st.write(f"Plazo máximo aprobado: {plazo_max} meses")
+            elif puntaje >= 60:
+                st.warning("⚠️ Préstamo CONDICIONAL")
+                st.write("Se requiere revisión adicional o garantía adicional")
+                st.write("Un asesor se comunicará contigo")
+            else:
+                st.error("❌ Préstamo RECHAZADO")
+                st.write("No cumples con los requisitos mínimos")
+
+            # Mostrar el puntaje obtenido
+            st.write(f"Puntaje de evaluación: {puntaje}/100")
+
+            # Recomendaciones para mejorar la elegibilidad si el puntaje es bajo
+            if puntaje < 60:
+                st.info("""
+                **Recomendaciones para mejorar tu elegibilidad:**
+                - Mejora tu puntaje crediticio pagando deudas a tiempo
+                - Reduce tu ratio de deuda/ingresos
+                - Considera ofrecer una garantía
+                - Mantén tu empleo actual por más tiempo
+                """)
 
 # Sección lateral con explicación del sistema experto
 st.sidebar.header("Acerca del Sistema Experto")
