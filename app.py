@@ -6,6 +6,13 @@ st.set_page_config(page_title="Sistema Experto para Préstamos", layout="wide")
 
 # Título de la aplicación
 st.title("🏦 Sistema Experto para Evaluación de Préstamos Personales")
+st.markdown("""
+<style>
+    .main .block-container {background-color: #f7f9fa; border-radius: 12px; padding: 24px;}
+    .stButton>button {background-color: #4CAF50; color: white; font-weight: bold; border-radius: 8px;}
+    .stSlider>div>div {color: #1976d2;}
+</style>
+""", unsafe_allow_html=True)
 
 # Descripción general del sistema
 st.write("""
@@ -80,25 +87,26 @@ def evaluar_prestamo(puntaje_credito, ingresos_mensuales, deudas, garantia, tiem
 # Interfaz de usuario con Streamlit para ingresar los datos del solicitante
 with st.form("form_prestamo"):
     st.header("Información del Solicitante")
+    st.markdown("Por favor, completa los siguientes campos para evaluar tu solicitud de préstamo. Los campos marcados con * son obligatorios.")
 
     col1, col2 = st.columns(2)
 
     with col1:
         # Entrada del puntaje crediticio
-        puntaje_credito = st.slider("Puntaje crediticio (300-850)", 300, 850, 650)
+        puntaje_credito = st.slider("Puntaje crediticio (300-850)*", 300, 850, 650, help="Un puntaje más alto mejora tus posibilidades de aprobación.")
         # Entrada de ingresos mensuales
-        ingresos_mensuales = st.number_input("Ingresos mensuales netos ($)", min_value=0, value=3000)
+        ingresos_mensuales = st.number_input("Ingresos mensuales netos ($)*", min_value=0, value=3000, help="Incluye tu ingreso neto mensual.")
         # Entrada de deudas mensuales
-        deudas = st.number_input("Deudas mensuales ($)", min_value=0, value=1000)
+        deudas = st.number_input("Deudas mensuales ($)*", min_value=0, value=1000, help="Suma total de tus pagos mensuales de deuda.")
 
     with col2:
         # Selección del tipo de garantía ofrecida
         garantia = st.selectbox("Garantía ofrecida",
-                                ["Ninguna", "Depósito", "Vehículo", "Propiedad"])
+                                ["Ninguna", "Depósito", "Vehículo", "Propiedad"], help="Selecciona si puedes ofrecer algún tipo de garantía.")
         # Entrada del tiempo en el empleo actual
-        tiempo_empleo = st.number_input("Tiempo en empleo actual (años)", min_value=0, max_value=50, value=3)
+        tiempo_empleo = st.number_input("Tiempo en empleo actual (años)*", min_value=0, max_value=50, value=3, help="Años en tu empleo actual.")
         # Entrada del monto solicitado
-        monto_prestamo = st.number_input("Monto solicitado ($)", min_value=100, value=5000)
+        monto_prestamo = st.number_input("Monto solicitado ($)*", min_value=100, value=5000, help="Cantidad que deseas solicitar.")
 
     # Botón para enviar el formulario y evaluar la solicitud
     submitted = st.form_submit_button("Evaluar Solicitud")
@@ -144,20 +152,23 @@ with st.form("form_prestamo"):
                 st.write("No cumples con los requisitos mínimos")
 
             # Mostrar el puntaje obtenido
-            st.write(f"Puntaje de evaluación: {puntaje}/100")
+            st.write(f"Puntaje de evaluación: <span style='color:#1976d2;font-size:22px'><b>{puntaje}/100</b></span>", unsafe_allow_html=True)
 
             # Recomendaciones para mejorar la elegibilidad si el puntaje es bajo
             if puntaje < 60:
                 st.info("""
-                **Recomendaciones para mejorar tu elegibilidad:**
-                - Mejora tu puntaje crediticio pagando deudas a tiempo
-                - Reduce tu ratio de deuda/ingresos
-                - Considera ofrecer una garantía
-                - Mantén tu empleo actual por más tiempo
-                """)
+                <span style='color:#e65100'><b>Recomendaciones para mejorar tu elegibilidad:</b></span>
+                <ul>
+                <li>Mejora tu puntaje crediticio pagando deudas a tiempo</li>
+                <li>Reduce tu ratio de deuda/ingresos</li>
+                <li>Considera ofrecer una garantía</li>
+                <li>Mantén tu empleo actual por más tiempo</li>
+                </ul>
+                """, unsafe_allow_html=True)
 
 # Sección lateral con explicación del sistema experto
 st.sidebar.header("Acerca del Sistema Experto")
+st.sidebar.image("https://cdn-icons-png.flaticon.com/512/3135/3135715.png", width=80)
 st.sidebar.write("""
 Este sistema utiliza reglas basadas en conocimiento de expertos en crédito para evaluar solicitudes de préstamos.
 
